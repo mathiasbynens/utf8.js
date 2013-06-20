@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 				'failOnError': true
 			},
 			'generate-test-data': { // Only when needed
-				'command': 'if [ ! -f data.json ]; then echo python generate-test-data.py; fi',
+				'command': 'if [ ! -f data.json ]; then python generate-test-data.py; fi',
 				'options': {
 					'execOptions': {
 						'cwd': 'tests'

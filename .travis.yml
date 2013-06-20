@@ -1,7 +1,6 @@
 language: node_js
 node_js:
   - "0.10"
-  - "0.8"
 before_script:
   - "npm install -g grunt-cli"
   # Narwhal uses a hardcoded path to openjdk v6, so use that version
@@ -15,5 +14,6 @@ before_script:
   - "PACKAGE=narwhal-0.3.2; sudo ln -s /opt/$PACKAGE/bin/narwhal /usr/local/bin/narwhal && sudo chmod +x /usr/local/bin/narwhal"
   # If the enviroment stores rt.jar in a different directory, find it and symlink the directory
   - "PREFIX=/usr/lib/jvm; if [ ! -d $PREFIX/java-6-openjdk ]; then for d in $PREFIX/java-6-openjdk-*; do if [ -e $d/jre/lib/rt.jar ]; then sudo ln -s $d $PREFIX/java-6-openjdk; break; fi; done; fi"
+  - "sudo apt-get install -qq python; python --version"
 script:
   "grunt ci"
