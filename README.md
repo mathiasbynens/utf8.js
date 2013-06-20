@@ -75,7 +75,7 @@ utf8.encode('\uD800\uDC01');
 
 ### `utf8.decode(byteString)`
 
-Encodes any given UTF-8-encoded string (`byteString`) as UTF-8, and returns the UTF-8-decoded version of the string. It throws an error when malformed UTF-8 is detected.
+Decodes any given UTF-8-encoded string (`byteString`) as UTF-8, and returns the UTF-8-decoded version of the string. It throws an error when malformed UTF-8 is detected.
 
 ```js
 utf8.decode('\xC2\xA9');
