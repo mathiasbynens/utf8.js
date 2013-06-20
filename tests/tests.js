@@ -33,8 +33,12 @@
 		}
 	}
 
-	// Lots of useful resources:
-	// http://tidy.sourceforge.net/cgi-bin/lxr/source/src/utf8.c
+	// Quick and dirty test to see if we’re in Node & need extended tests
+	var runExtendedTests = (function() {
+		try {
+			return process.argv[0] == 'node' && process.argv[2] == '--extended';
+		} catch(error) { }
+	}());
 
 	var data = [
 		// 1-byte
@@ -136,7 +140,7 @@
 			'encoded': '\xED\xB0\x80A'
 		},
 		{
-			'description': 'THIS ONE SHOULD WORK Unmatched low surrogate, followed by a surrogate pair, followed by an unmatched low surrogate',
+			'description': 'Unmatched low surrogate, followed by a surrogate pair, followed by an unmatched low surrogate',
 			'decoded': '\uDC00\uD834\uDF06\uDC00',
 			'encoded': '\xED\xB0\x80\xF0\x9D\x8C\x86\xED\xB0\x80'
 		},
@@ -167,10 +171,17 @@
 			'decoded': '\uDBFF\uDFFF',
 			'encoded': '\xF4\x8F\xBF\xBF'
 		}
-
 	];
-	//var data = require('./data.json');
 
+	if (runExtendedTests) {
+		data = data.concat(require('./data.json'));
+	}
+
+	// `throws` is a reserved word in ES3; alias it to avoid errors
+	var raises = QUnit.assert['throws'];
+
+	// explicitly call `QUnit.module()` instead of `module()`
+	// in case we are in a CLI environment
 	QUnit.module('utf8.js');
 
 	test('encode/decode', function() {
@@ -188,6 +199,36 @@
 				'Decoding: ' + description
 			);
 		});
+
+		// Error handling
+		raises(
+			function() {
+				utf8.decode('\uFFFF');
+			},
+			Error,
+			'Error: invalid UTF-8 detected'
+		);
+		raises(
+			function() {
+				utf8.decode('\xE9\x00\x00');
+			},
+			Error,
+			'Error: invalid continuation byte (4-byte sequence expected)'
+		);
+		raises(
+			function() {
+				utf8.decode('\xC2\uFFFF');
+			},
+			Error,
+			'Error: invalid continuation byte'
+		);
+		raises(
+			function() {
+				utf8.decode('\xF0\x9D');
+			},
+			Error,
+			'Error: invalid byte index'
+		);
 	});
 
 	/*--------------------------------------------------------------------------*/
