@@ -1,6 +1,6 @@
 # utf8.js [![Build status](https://travis-ci.org/mathiasbynens/utf8.js.png?branch=master)](https://travis-ci.org/mathiasbynens/utf8.js) [![Dependency status](https://gemnasium.com/mathiasbynens/utf8.js.png)](https://gemnasium.com/mathiasbynens/utf8.js)
 
-_utf8.js_ is a well-tested UTF-8 encoder/decoder written in JavaScript. Unlike many other JavaScript solutions, it is designed to be a _proper_ UTF-8 encoder/decoder: it can encode/decode any given Unicode code point, including astral symbols and unpaired surrogates.
+_utf8.js_ is a well-tested UTF-8 encoder/decoder written in JavaScript. Unlike many other JavaScript solutions, it is designed to be a _proper_ UTF-8 encoder/decoder: it can encode/decode any given Unicode code point, including astral symbols and unpaired surrogates. [Here’s an online demo.](http://mothereff.in/utf-8)
 
 Feel free to fork if you see possible improvements!
 
