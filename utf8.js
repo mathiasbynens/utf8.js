@@ -64,6 +64,26 @@
 		return output;
 	}
 
+	var object = {};
+	var hasOwnProperty = object.hasOwnProperty;
+	function extend(destination, source) {
+		var key;
+		for (key in source) {
+			if (hasOwnProperty.call(source, key)) {
+				destination[key] = source[key];
+			}
+		}
+		return destination;
+	}
+
+	var replacementCharacter = 0xFFFD;
+	function error(message) {
+		if (isStrict) {
+			throw Error(message);
+		}
+		return replacementCharacter;
+	}
+
 	/*--------------------------------------------------------------------------*/
 
 	function createByte(codePoint, shift) {
@@ -108,7 +128,7 @@
 
 	function readContinuationByte() {
 		if (byteIndex >= byteCount) {
-			throw Error('Invalid byte index');
+			return error('Invalid byte index');
 		}
 
 		var continuationByte = byteArray[byteIndex] & 0xFF;
@@ -119,7 +139,7 @@
 		}
 
 		// If we end up here, it’s not a continuation byte
-		throw Error('Invalid continuation byte');
+		return error('Invalid continuation byte');
 	}
 
 	function decodeSymbol() {
@@ -130,7 +150,7 @@
 		var codePoint;
 
 		if (byteIndex > byteCount) {
-			throw Error('Invalid byte index');
+			return error('Invalid byte index');
 		}
 
 		if (byteIndex == byteCount) {
@@ -149,11 +169,14 @@
 		// 2-byte sequence
 		if ((byte1 & 0xE0) == 0xC0) {
 			var byte2 = readContinuationByte();
+			if (byte2 == replacementCharacter) {
+				return replacementCharacter + replacementCharacter;
+			}
 			codePoint = ((byte1 & 0x1F) << 6) | byte2;
 			if (codePoint >= 0x80) {
 				return codePoint;
 			} else {
-				throw Error('Invalid continuation byte');
+				return error('Invalid continuation byte');
 			}
 		}
 
@@ -161,11 +184,14 @@
 		if ((byte1 & 0xF0) == 0xE0) {
 			byte2 = readContinuationByte();
 			byte3 = readContinuationByte();
+			if (byte2 == replacementCharacter || byte3 == replacementCharacter) {
+				return replacementCharacter + replacementCharacter + replacementCharacter;
+			}
 			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
 			if (codePoint >= 0x0800) {
 				return codePoint;
 			} else {
-				throw Error('Invalid continuation byte');
+				return error('Invalid continuation byte');
 			}
 		}
 
@@ -174,6 +200,13 @@
 			byte2 = readContinuationByte();
 			byte3 = readContinuationByte();
 			byte4 = readContinuationByte();
+			if (
+				byte2 == replacementCharacter || byte3 == replacementCharacter ||
+				byte4 == replacementCharacter
+			) {
+				return replacementCharacter + replacementCharacter +
+					replacementCharacter + replacementCharacter;
+			}
 			codePoint = ((byte1 & 0x0F) << 0x12) | (byte2 << 0x0C) |
 				(byte3 << 0x06) | byte4;
 			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
@@ -181,13 +214,18 @@
 			}
 		}
 
-		throw Error('Invalid UTF-8 detected');
+		return error('Invalid UTF-8 detected');
 	}
 
 	var byteArray;
 	var byteCount;
 	var byteIndex;
-	function utf8decode(byteString) {
+	var isStrict;
+	function utf8decode(byteString, options) {
+		options = extend({
+			'strict': false
+		}, options);
+		isStrict = options.strict;
 		byteArray = ucs2decode(byteString);
 		byteCount = byteArray.length;
 		byteIndex = 0;
@@ -221,8 +259,6 @@
 		if (freeModule) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = utf8;
 		} else { // in Narwhal or RingoJS v0.7.0-
-			var object = {};
-			var hasOwnProperty = object.hasOwnProperty;
 			for (var key in utf8) {
 				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
 			}
