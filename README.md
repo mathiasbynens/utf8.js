@@ -1,4 +1,4 @@
-# utf8.js [![Build status](https://travis-ci.org/mathiasbynens/utf8.js.png?branch=master)](https://travis-ci.org/mathiasbynens/utf8.js) [![Dependency status](https://gemnasium.com/mathiasbynens/utf8.js.png)](https://gemnasium.com/mathiasbynens/utf8.js)
+# utf8.js [![Build status](https://travis-ci.org/mathiasbynens/utf8.js.svg?branch=master)](https://travis-ci.org/mathiasbynens/utf8.js) [![Dependency status](https://gemnasium.com/mathiasbynens/utf8.js.svg)](https://gemnasium.com/mathiasbynens/utf8.js)
 
 _utf8.js_ is a well-tested UTF-8 encoder/decoder written in JavaScript. Unlike many other JavaScript solutions, it is designed to be a _proper_ UTF-8 encoder/decoder: it can encode/decode any given Unicode code point, including astral symbols and unpaired surrogates. [Here’s an online demo.](http://mothereff.in/utf-8)
 
@@ -110,10 +110,10 @@ Long before utf8.js was created, the `utf8` module on npm was registered and use
 
 ## Author
 
-| [![twitter/mathias](http://gravatar.com/avatar/24e08a9ea84deb17ae121074d0f17125?s=70)](http://twitter.com/mathias "Follow @mathias on Twitter") |
+| [![twitter/mathias](https://gravatar.com/avatar/24e08a9ea84deb17ae121074d0f17125?s=70)](https://twitter.com/mathias "Follow @mathias on Twitter") |
 |---|
 | [Mathias Bynens](http://mathiasbynens.be/) |
 
 ## License
 
-utf8.js is dual licensed under the [MIT](http://mths.be/mit) and [GPL](http://mths.be/gpl) licenses.
+utf8.js is available under the [MIT](http://mths.be/mit) license.
