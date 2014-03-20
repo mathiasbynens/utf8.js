@@ -37,13 +37,12 @@
 	"scripts": {
 		"test": "node tests/tests.js"
 	},
-	"dependencies": {},
 	"devDependencies": {
-		"grunt": "~0.4.1",
-		"grunt-shell": "~0.2.2",
-		"istanbul": "~0.1.36",
+		"grunt": "~0.4.4",
+		"grunt-shell": "~0.6.4",
+		"istanbul": "~0.2.6",
 		"qunit-clib": "~1.3.0",
 		"qunitjs": "~1.11.0",
-		"requirejs": "~2.1.6"
+		"requirejs": "~2.1.11"
 	}
 }
