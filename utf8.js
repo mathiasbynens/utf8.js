@@ -119,10 +119,14 @@
 		}
 
 		// If we end up here, it’s not a continuation byte
+		if (forceFinish) {
+			return continuationByte;
+		}
+		
 		throw Error('Invalid continuation byte');
 	}
 
-	function decodeSymbol() {
+	function decodeSymbol(forceFinish) {
 		var byte1;
 		var byte2;
 		var byte3;
@@ -148,7 +152,7 @@
 
 		// 2-byte sequence
 		if ((byte1 & 0xE0) == 0xC0) {
-			var byte2 = readContinuationByte();
+			var byte2 = readContinuationByte(forceFinish);
 			codePoint = ((byte1 & 0x1F) << 6) | byte2;
 			if (codePoint >= 0x80) {
 				return codePoint;
@@ -159,8 +163,8 @@
 
 		// 3-byte sequence (may include unpaired surrogates)
 		if ((byte1 & 0xF0) == 0xE0) {
-			byte2 = readContinuationByte();
-			byte3 = readContinuationByte();
+			byte2 = readContinuationByte(forceFinish);
+			byte3 = readContinuationByte(forceFinish);
 			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
 			if (codePoint >= 0x0800) {
 				return codePoint;
@@ -171,9 +175,9 @@
 
 		// 4-byte sequence
 		if ((byte1 & 0xF8) == 0xF0) {
-			byte2 = readContinuationByte();
-			byte3 = readContinuationByte();
-			byte4 = readContinuationByte();
+			byte2 = readContinuationByte(forceFinish);
+			byte3 = readContinuationByte(forceFinish);
+			byte4 = readContinuationByte(forceFinish);
 			codePoint = ((byte1 & 0x0F) << 0x12) | (byte2 << 0x0C) |
 				(byte3 << 0x06) | byte4;
 			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
@@ -187,13 +191,17 @@
 	var byteArray;
 	var byteCount;
 	var byteIndex;
-	function utf8decode(byteString) {
+	function utf8decode(byteString, params) {
+		var forceFinish = false;
+		if (typeof params !== 'undefined' && typeof params.forceFinish !== 'undefined') {
+			forceFinish = params.forceFinish;
+		}
 		byteArray = ucs2decode(byteString);
 		byteCount = byteArray.length;
 		byteIndex = 0;
 		var codePoints = [];
 		var tmp;
-		while ((tmp = decodeSymbol()) !== false) {
+		while ((tmp = decodeSymbol(forceFinish)) !== false) {
 			codePoints.push(tmp);
 		}
 		return ucs2encode(codePoints);
