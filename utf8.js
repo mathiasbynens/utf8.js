@@ -64,6 +64,16 @@
 		return output;
 	}
 
+	function ucs2encodeShim(arrayOrSingle) {
+		if (arrayOrSingle instanceof Array) {
+			return ucs2encode(arrayOrSingle);
+		}
+		else {
+			var a = [];
+			a.push(arrayOrSingle);
+			return ucs2encode(a);
+		}
+	}
 	/*--------------------------------------------------------------------------*/
 
 	function createByte(codePoint, shift) {
@@ -119,7 +129,8 @@
 		}
 
 		// If we end up here, it’s not a continuation byte
-		throw Error('Invalid continuation byte');
+		throw Error('Invalid continuation at byte ' +
+			byteIndex + ': ' + byteArray[byteIndex-1].toString(16));
 	}
 
 	function decodeSymbol() {
@@ -141,6 +152,9 @@
 		byte1 = byteArray[byteIndex] & 0xFF;
 		byteIndex++;
 
+		var errByte =
+			byteIndex + ': ' + byteArray[byteIndex-1].toString(16);
+
 		// 1-byte sequence (no continuation bytes)
 		if ((byte1 & 0x80) == 0) {
 			return byte1;
@@ -153,7 +167,7 @@
 			if (codePoint >= 0x80) {
 				return codePoint;
 			} else {
-				throw Error('Invalid continuation byte');
+				throw Error('Invalid continuation at byte' + errByte);
 			}
 		}
 
@@ -165,7 +179,7 @@
 			if (codePoint >= 0x0800) {
 				return codePoint;
 			} else {
-				throw Error('Invalid continuation byte');
+				throw Error('Invalid continuation at byte' + errByte);
 			}
 		}
 
@@ -181,13 +195,13 @@
 			}
 		}
 
-		throw Error('Invalid UTF-8 detected');
+		throw Error('Invalid UTF-8 detected at byte ' + errByte);
 	}
 
 	var byteArray;
 	var byteCount;
 	var byteIndex;
-	function utf8decode(byteString) {
+	function utf8decode(byteString, toArray) {
 		byteArray = ucs2decode(byteString);
 		byteCount = byteArray.length;
 		byteIndex = 0;
@@ -196,15 +210,22 @@
 		while ((tmp = decodeSymbol()) !== false) {
 			codePoints.push(tmp);
 		}
-		return ucs2encode(codePoints);
+		if (typeof toArray !== 'undefined') {
+			return codePoints;
+		}
+		else {
+			return ucs2encode(codePoints);
+		}
 	}
+
 
 	/*--------------------------------------------------------------------------*/
 
 	var utf8 = {
 		'version': '2.0.0',
 		'encode': utf8encode,
-		'decode': utf8decode
+		'decode': utf8decode,
+		'ucs2encode' : ucs2encodeShim
 	};
 
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
