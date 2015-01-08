@@ -1,21 +1,26 @@
-;(function(root) {
+(function(root) {
 	'use strict';
 
-	/** Use a single `load` function */
-	var load = typeof require == 'function' ? require : root.load;
+	var noop = Function.prototype;
 
-	/** The unit testing framework */
+	var load = (typeof require == 'function' && !(root.define && define.amd)) ?
+		require :
+		(!root.document && root.java && root.load) || noop;
+
 	var QUnit = (function() {
-		var noop = Function.prototype;
 		return root.QUnit || (
 			root.addEventListener || (root.addEventListener = noop),
 			root.setTimeout || (root.setTimeout = noop),
 			root.QUnit = load('../node_modules/qunitjs/qunit/qunit.js') || root.QUnit,
-			(load('../node_modules/qunit-clib/qunit-clib.js') || { 'runInContext': noop }).runInContext(root),
 			addEventListener === noop && delete root.addEventListener,
 			root.QUnit
 		);
 	}());
+
+	var qe = load('../node_modules/qunit-extras/qunit-extras.js');
+	if (qe) {
+		qe.runInContext(root);
+	}
 
 	/** The `utf8` object to test */
 	var utf8 = root.utf8 || (root.utf8 = (
@@ -96,63 +101,75 @@
 		{
 			'codePoint': 0xD800,
 			'decoded': '\uD800',
-			'encoded': '\xED\xA0\x80'
+			'encoded': '\xED\xA0\x80',
+			'error': true
 		},
 		{
 			'description': 'High surrogate followed by another high surrogate',
 			'decoded': '\uD800\uD800',
-			'encoded': '\xED\xA0\x80\xED\xA0\x80'
+			'encoded': '\xED\xA0\x80\xED\xA0\x80',
+			'error': true
 		},
 		{
 			'description': 'High surrogate followed by a symbol that is not a surrogate',
 			'decoded': '\uD800A',
-			'encoded': '\xED\xA0\x80A'
+			'encoded': '\xED\xA0\x80A',
+			'error': true
 		},
 		{
 			'description': 'Unmatched high surrogate, followed by a surrogate pair, followed by an unmatched high surrogate',
 			'decoded': '\uD800\uD834\uDF06\uD800',
-			'encoded': '\xED\xA0\x80\xF0\x9D\x8C\x86\xED\xA0\x80'
+			'encoded': '\xED\xA0\x80\xF0\x9D\x8C\x86\xED\xA0\x80',
+			'error': true
 		},
 		{
 			'codePoint': 0xD9AF,
 			'decoded': '\uD9AF',
-			'encoded': '\xED\xA6\xAF'
+			'encoded': '\xED\xA6\xAF',
+			'error': true
 		},
 		{
 			'codePoint': 0xDBFF,
 			'decoded': '\uDBFF',
-			'encoded': '\xED\xAF\xBF'
+			'encoded': '\xED\xAF\xBF',
+			'error': true
 		},
 		// low surrogates: 0xDC00 to 0xDFFF
 		{
 			'codePoint': 0xDC00,
 			'decoded': '\uDC00',
-			'encoded': '\xED\xB0\x80'
+			'encoded': '\xED\xB0\x80',
+			'error': true
 		},
 		{
 			'description': 'Low surrogate followed by another low surrogate',
 			'decoded': '\uDC00\uDC00',
-			'encoded': '\xED\xB0\x80\xED\xB0\x80'
+			'encoded': '\xED\xB0\x80\xED\xB0\x80',
+			'error': true
 		},
 		{
 			'description': 'Low surrogate followed by a symbol that is not a surrogate',
 			'decoded': '\uDC00A',
-			'encoded': '\xED\xB0\x80A'
+			'encoded': '\xED\xB0\x80A',
+			'error': true
 		},
 		{
 			'description': 'Unmatched low surrogate, followed by a surrogate pair, followed by an unmatched low surrogate',
 			'decoded': '\uDC00\uD834\uDF06\uDC00',
-			'encoded': '\xED\xB0\x80\xF0\x9D\x8C\x86\xED\xB0\x80'
+			'encoded': '\xED\xB0\x80\xF0\x9D\x8C\x86\xED\xB0\x80',
+			'error': true
 		},
 		{
 			'codePoint': 0xDEEE,
 			'decoded': '\uDEEE',
-			'encoded': '\xED\xBB\xAE'
+			'encoded': '\xED\xBB\xAE',
+			'error': true
 		},
 		{
 			'codePoint': 0xDFFF,
 			'decoded': '\uDFFF',
-			'encoded': '\xED\xBF\xBF'
+			'encoded': '\xED\xBF\xBF',
+			'error': true
 		},
 
 		// 4-byte
@@ -188,16 +205,33 @@
 		forEach(data, function(object) {
 			var description = object.description || 'U+' + object.codePoint.toString(16).toUpperCase();
 			;
-			equal(
-				object.encoded,
-				utf8.encode(object.decoded),
-				'Encoding: ' + description
-			);
-			equal(
-				object.decoded,
-				utf8.decode(object.encoded),
-				'Decoding: ' + description
-			);
+			if (object.error) {
+				raises(
+					function() {
+						utf8.decode(object.encoded);
+					},
+					Error,
+					'Error: non-scalar value detected'
+				);
+				raises(
+					function() {
+						utf8.encode(object.decoded);
+					},
+					Error,
+					'Error: non-scalar value detected'
+				);
+			} else {
+				equal(
+					object.encoded,
+					utf8.encode(object.decoded),
+					'Encoding: ' + description
+				);
+				equal(
+					object.decoded,
+					utf8.decode(object.encoded),
+					'Decoding: ' + description
+				);
+			}
 		});
 
 		// Error handling

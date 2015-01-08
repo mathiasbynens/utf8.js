@@ -3,7 +3,7 @@
 import re
 import json
 
-# http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+# https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
 # http://stackoverflow.com/a/13436167/96656
 def unisymbol(codePoint):
 	if codePoint >= 0x0000 and codePoint <= 0xFFFF:
@@ -25,6 +25,9 @@ def writeFile(filename, contents):
 
 data = []
 for codePoint in range(0x000000, 0x10FFFF + 1):
+	# Skip non-scalar values.
+	if codePoint >= 0xD800 and codePoint <= 0xDFFF:
+		continue
 	symbol = unisymbol(codePoint)
 	# http://stackoverflow.com/a/17199950/96656
 	bytes = symbol.encode('utf8').decode('latin1')
