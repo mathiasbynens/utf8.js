@@ -6,7 +6,7 @@ Feel free to fork if you see possible improvements!
 
 ## Installation
 
-Via [npm](https://www.npmjs.org/):
+Via [npm](https://www.npmjs.com/):
 
 ```bash
 npm install utf8
