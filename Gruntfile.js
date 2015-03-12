@@ -39,6 +39,9 @@ module.exports = function(grunt) {
 				'command': 'echo "Testing in Ringo..."; ringo -o -1 "tests/tests.js"'
 			},
 			'test-node': {
+				'command': 'echo "Testing in Node..."; node "tests/tests.js"'
+			},
+			'test-node-extended': {
 				'command': 'echo "Testing in Node..."; node "tests/tests.js" --extended'
 			},
 			'test-browser': {
@@ -61,11 +64,12 @@ module.exports = function(grunt) {
 	grunt.registerTask('test', [
 		'shell:generate-test-data',
 		'ci',
+		'shell:test-node-extended',
 		'shell:test-browser'
 	]);
 
 	grunt.registerTask('default', [
-		'shell:test-node',
+		'shell:test-node-extended',
 		'cover'
 	]);
 

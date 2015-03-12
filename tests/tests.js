@@ -42,7 +42,7 @@
 	var runExtendedTests = (function() {
 		try {
 			return process.argv[0] == 'node' && process.argv[2] == '--extended';
-		} catch(error) { }
+		} catch (exception) { }
 	}());
 
 	var data = [
