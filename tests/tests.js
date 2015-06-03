@@ -187,6 +187,13 @@
 			'codePoint': 0x10FFF,
 			'decoded': '\uDBFF\uDFFF',
 			'encoded': '\xF4\x8F\xBF\xBF'
+		},
+
+		// Long string
+		{
+			'description': 'Long string',
+			'decoded': new Array(10001).join('x'),
+			'encoded': new Array(10001).join('x')
 		}
 	];
 
