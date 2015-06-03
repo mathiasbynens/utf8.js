@@ -87,10 +87,19 @@
 		}
 	}
 
+	/**
+	 * Creates temporary buffer for faster string joining
+	 * @param {number} strLen - converted string length
+	 * @returns {Array}
+	 */
+	function createTmpBuffer(strLen) {
+		return new Array(strLen < 100 ? 128 : 1024);
+	}
+
 	function utf8encode(str) {
 		var decoder = new Ucs2StreamDecoder(str),
 			codePoint,
-			arr = new Array(1000),
+			arr = createTmpBuffer(str.length),
 			arrIx = 0, arrLen = arr.length,
 			result = '';
 		while (true) {
@@ -143,8 +152,8 @@
 
 		// 2-byte sequence
 		if ((byte1 & 0xE0) == 0xC0) {
-			var b = this.readContinuationByte();
-			codePoint = ((byte1 & 0x1F) << 6) | b;
+			byte2 = this.readContinuationByte();
+			codePoint = ((byte1 & 0x1F) << 6) | byte2;
 			if (codePoint >= 0x80) {
 				return codePoint;
 			} else {
@@ -195,7 +204,7 @@
 	function utf8decode(str) {
 		var decoder = new CodePointStreamDecoder(new Ucs2StreamDecoder(str)),
 			codePoint,
-			arr = new Array(1000),
+			arr = createTmpBuffer(str.length),
 			arrIx = 0, arrLen = arr.length,
 			result = '';
 		while (true) {
@@ -232,19 +241,26 @@
 
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
 	// like the following:
-	if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-		define(function() { return utf8; });
-	} else if (freeExports && !freeExports.nodeType) {
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define(function() {
+			return utf8;
+		});
+	}	else if (freeExports && !freeExports.nodeType) {
 		if (freeModule) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = utf8;
 		} else { // in Narwhal or RingoJS v0.7.0-
+			var object = {};
+			var hasOwnProperty = object.hasOwnProperty;
 			for (var key in utf8) {
-				if (Object.prototype.hasOwnProperty.call(utf8, key)) {
-					freeExports[key] = utf8[key];
-				}
+				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
 			}
 		}
 	} else { // in Rhino or a web browser
 		root.utf8 = utf8;
 	}
+
 }(this));

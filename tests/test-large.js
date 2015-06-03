@@ -1,5 +1,7 @@
 'use strict';
 
+var b = new Buffer('x', 'utf8');
+
 // test with node.js on 50MB data encoding
 
 var utf8 = require('../utf8.js');
@@ -9,7 +11,7 @@ var letters = ['a', 'ы', '6', 'ð'];
 for (var i = 0; i < buffer.length; i++) {
 	buffer[i] = letters[i % letters.length].charCodeAt(0);
 }
-var str = buffer.toString('utf8');
+var str = buffer.toString('utf16le');
 buffer = null;
 console.log('created string. mem: %d', mem());
 str = utf8.encode(str);
