@@ -3,6 +3,7 @@
 import re
 import json
 
+
 # https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
 # http://stackoverflow.com/a/13436167/96656
 def unisymbol(codePoint):
@@ -15,8 +16,10 @@ def unisymbol(codePoint):
     else:
         return 'Error'
 
+
 def hexify(codePoint):
     return 'U+' + hex(codePoint)[2:].upper().zfill(6)
+
 
 def writeFile(filename, contents):
     print filename
