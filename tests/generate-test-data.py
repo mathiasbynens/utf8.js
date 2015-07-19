@@ -38,7 +38,7 @@ for codePoint in range(0x000000, 0x10FFFF + 1):
         'codePoint': codePoint,
         'decoded': symbol,
         'encoded': bytes
-    });
+    })
 
 jsonData = json.dumps(data, sort_keys=False, indent=2, separators=(',', ': '))
 # Use tabs instead of double spaces for indentation
