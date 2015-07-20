@@ -20,6 +20,10 @@
 		"url": "https://github.com/mathiasbynens/utf8.js.git"
 	},
 	"bugs": "https://github.com/mathiasbynens/utf8.js/issues",
+	"files": [
+		"LICENSE-MIT.txt",
+		"utf8.js"
+	],
 	"scripts": {
 		"test": "node tests/tests.js"
 	},
