@@ -1,4 +1,4 @@
-/*! https://mths.be/utf8js v2.0.0 by @mathias */
+/*! https://mths.be/utf8js v2.1.1 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -212,7 +212,7 @@
 	/*--------------------------------------------------------------------------*/
 
 	var utf8 = {
-		'version': '2.0.0',
+		'version': '2.1.1',
 		'encode': utf8encode,
 		'decode': utf8decode
 	};
