@@ -187,6 +187,18 @@
 			'codePoint': 0x10FFF,
 			'decoded': '\uDBFF\uDFFF',
 			'encoded': '\xF4\x8F\xBF\xBF'
+		},
+
+		// Long strings
+		{
+			'description': 'Long string',
+			'decoded': new Array(2000).join('x') + new Array(1000).join('\uDBFF\uDFFF'),
+			'encoded': new Array(2000).join('x') + new Array(1000).join('\xF4\x8F\xBF\xBF')
+		},
+		{
+			'description': 'Long string another',
+			'decoded': new Array(1025).join('x'),
+			'encoded': new Array(1025).join('x')
 		}
 	];
 
@@ -259,6 +271,13 @@
 		raises(
 			function() {
 				utf8.decode('\xF0\x9D');
+			},
+			Error,
+			'Error: invalid byte index'
+		);
+		raises(
+			function() {
+				utf8.decode('\xC0\x0F');
 			},
 			Error,
 			'Error: invalid byte index'
