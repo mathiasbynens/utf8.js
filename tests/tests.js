@@ -92,6 +92,11 @@
 			'encoded': '\xE2\xB0\xBC'
 		},
 		{
+			'codePoint': 0xFFFD,
+			'decoded': '\uFFFD',
+			'encoded': '\xEF\xBF\xBD',
+		},
+		{
 			'codePoint': 0xFFFF,
 			'decoded': '\uFFFF',
 			'encoded': '\xEF\xBF\xBF'
@@ -101,74 +106,98 @@
 		{
 			'codePoint': 0xD800,
 			'decoded': '\uD800',
+			'decodedNonStrict': '\uFFFD',
 			'encoded': '\xED\xA0\x80',
+			'encodedNonStrict': '\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'description': 'High surrogate followed by another high surrogate',
 			'decoded': '\uD800\uD800',
+			'decodedNonStrict': '\uFFFD\uFFFD',
 			'encoded': '\xED\xA0\x80\xED\xA0\x80',
+			'encodedNonStrict': '\xEF\xBF\xBD\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'description': 'High surrogate followed by a symbol that is not a surrogate',
 			'decoded': '\uD800A',
+			'decodedNonStrict': '\uFFFDA',
 			'encoded': '\xED\xA0\x80A',
+			'encodedNonStrict': '\xEF\xBF\xBDA',
 			'error': true
 		},
 		{
 			'description': 'Unmatched high surrogate, followed by a surrogate pair, followed by an unmatched high surrogate',
 			'decoded': '\uD800\uD834\uDF06\uD800',
+			'decodedNonStrict': '\uFFFD\uD834\uDF06\uFFFD',
 			'encoded': '\xED\xA0\x80\xF0\x9D\x8C\x86\xED\xA0\x80',
+			'encodedNonStrict': '\xEF\xBF\xBD\xF0\x9D\x8C\x86\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'codePoint': 0xD9AF,
 			'decoded': '\uD9AF',
+			'decodedNonStrict': '\uFFFD',
 			'encoded': '\xED\xA6\xAF',
+			'encodedNonStrict': '\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'codePoint': 0xDBFF,
 			'decoded': '\uDBFF',
+			'decodedNonStrict': '\uFFFD',
 			'encoded': '\xED\xAF\xBF',
+			'encodedNonStrict': '\xEF\xBF\xBD',
 			'error': true
 		},
 		// low surrogates: 0xDC00 to 0xDFFF
 		{
 			'codePoint': 0xDC00,
 			'decoded': '\uDC00',
+			'decodedNonStrict': '\uFFFD',
 			'encoded': '\xED\xB0\x80',
+			'encodedNonStrict': '\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'description': 'Low surrogate followed by another low surrogate',
 			'decoded': '\uDC00\uDC00',
+			'decodedNonStrict': '\uFFFD\uFFFD',
 			'encoded': '\xED\xB0\x80\xED\xB0\x80',
+			'encodedNonStrict': '\xEF\xBF\xBD\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'description': 'Low surrogate followed by a symbol that is not a surrogate',
 			'decoded': '\uDC00A',
+			'decodedNonStrict': '\uFFFDA',
 			'encoded': '\xED\xB0\x80A',
+			'encodedNonStrict': '\xEF\xBF\xBDA',
 			'error': true
 		},
 		{
 			'description': 'Unmatched low surrogate, followed by a surrogate pair, followed by an unmatched low surrogate',
 			'decoded': '\uDC00\uD834\uDF06\uDC00',
+			'decodedNonStrict': '\uFFFD\uD834\uDF06\uFFFD',
 			'encoded': '\xED\xB0\x80\xF0\x9D\x8C\x86\xED\xB0\x80',
+			'encodedNonStrict': '\xEF\xBF\xBD\xF0\x9D\x8C\x86\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'codePoint': 0xDEEE,
 			'decoded': '\uDEEE',
+			'decodedNonStrict': '\uFFFD',
 			'encoded': '\xED\xBB\xAE',
+			'encodedNonStrict': '\xEF\xBF\xBD',
 			'error': true
 		},
 		{
 			'codePoint': 0xDFFF,
 			'decoded': '\uDFFF',
+			'decodedNonStrict': '\uFFFD',
 			'encoded': '\xED\xBF\xBF',
+			'encodedNonStrict': '\xEF\xBF\xBD',
 			'error': true
 		},
 
@@ -204,7 +233,7 @@
 	test('encode/decode', function() {
 		forEach(data, function(object) {
 			var description = object.description || 'U+' + object.codePoint.toString(16).toUpperCase();
-			;
+
 			if (object.error) {
 				raises(
 					function() {
@@ -219,6 +248,16 @@
 					},
 					Error,
 					'Error: non-scalar value detected'
+				);
+				equal(
+					object.encodedNonStrict,
+					utf8.encode(object.decoded, { strict: false }),
+					'Encoding (non-strict): ' + description
+				);
+				equal(
+					object.decodedNonStrict,
+					utf8.decode(object.encoded, { strict: false }),
+					'Decoding (non-strict): ' + description
 				);
 			} else {
 				equal(
