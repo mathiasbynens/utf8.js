@@ -219,15 +219,10 @@
 
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
 	// like the following:
-	if (
-		typeof define == 'function' &&
-		typeof define.amd == 'object' &&
-		define.amd
-	) {
-		define(function() {
-			return utf8;
-		});
-	}	else if (freeExports && !freeExports.nodeType) {
+	//
+	// Check exports first, in case of loading a browserfied library in AMD style,
+	// should use exports instead of define a AMD module
+	if (freeExports && !freeExports.nodeType) {
 		if (freeModule) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = utf8;
 		} else { // in Narwhal or RingoJS v0.7.0-
@@ -237,6 +232,14 @@
 				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
 			}
 		}
+	} else if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define(function() {
+			return utf8;
+		});
 	} else { // in Rhino or a web browser
 		root.utf8 = utf8;
 	}
