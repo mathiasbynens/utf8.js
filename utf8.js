@@ -1,21 +1,10 @@
-/*! https://mths.be/utf8js v2.1.2 by @mathias */
-;(function(root) {
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.utf8 = global.utf8 || {})));
+}(this, (function (exports) { 'use strict';
 
-	// Detect free variables `exports`
-	var freeExports = typeof exports == 'object' && exports;
-
-	// Detect free variable `module`
-	var freeModule = typeof module == 'object' && module &&
-		module.exports == freeExports && module;
-
-	// Detect free variable `global`, from Node.js or Browserified code,
-	// and use it as `root`
-	var freeGlobal = typeof global == 'object' && global;
-	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
-		root = freeGlobal;
-	}
-
-	/*--------------------------------------------------------------------------*/
+	/*! https://mths.be/utf8js v2.1.2 by @mathias */
 
 	var stringFromCharCode = String.fromCharCode;
 
@@ -211,34 +200,14 @@
 
 	/*--------------------------------------------------------------------------*/
 
-	var utf8 = {
-		'version': '2.1.2',
-		'encode': utf8encode,
-		'decode': utf8decode
-	};
+	const version = '2.1.2';
+	const encode = utf8encode;
+	const decode = utf8decode;
 
-	// Some AMD build optimizers, like r.js, check for specific condition patterns
-	// like the following:
-	if (
-		typeof define == 'function' &&
-		typeof define.amd == 'object' &&
-		define.amd
-	) {
-		define(function() {
-			return utf8;
-		});
-	}	else if (freeExports && !freeExports.nodeType) {
-		if (freeModule) { // in Node.js or RingoJS v0.8.0+
-			freeModule.exports = utf8;
-		} else { // in Narwhal or RingoJS v0.7.0-
-			var object = {};
-			var hasOwnProperty = object.hasOwnProperty;
-			for (var key in utf8) {
-				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
-			}
-		}
-	} else { // in Rhino or a web browser
-		root.utf8 = utf8;
-	}
+	exports.encode = encode;
+	exports.decode = decode;
+	exports.version = version;
 
-}(this));
+	Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

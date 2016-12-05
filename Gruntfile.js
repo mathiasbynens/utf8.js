@@ -46,11 +46,24 @@ module.exports = function(grunt) {
 			},
 			'test-browser': {
 				'command': 'echo "Testing in a browser..."; open "tests/index.html"'
+			},
+		},
+		rollup: {
+		  options: {
+				format: 'umd',
+				moduleName: 'utf8'
+			},
+		  dist: {
+				files: {
+			    './utf8.js': ['./utf8.es.js'], // Only one source file is permitted
+			  },
 			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-shell');
+
+	grunt.loadNpmTasks('grunt-rollup');
 
 	grunt.registerTask('cover', 'shell:cover-html');
 	grunt.registerTask('ci', [
