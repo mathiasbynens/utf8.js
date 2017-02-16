@@ -73,10 +73,11 @@ utf8.encode('\uD800\uDC01');
 // → '\xF0\x90\x80\x81'
 ```
 
-### `utf8.decode(byteString)`
+### `utf8.decode(byteString, options)`
 
 Decodes any given UTF-8-encoded string (`byteString`) as UTF-8, and returns the UTF-8-decoded version of the string. It throws an error when malformed UTF-8 is detected. (If you need to be able to decode encoded non-scalar values as well, use [WTF-8](https://mths.be/wtf8) instead.)
 
+You can use `allowTruncatedEnd` option to ignore last symbol if it was truncated on the end of input.
 ```js
 utf8.decode('\xC2\xA9');
 // → '\xA9'
@@ -84,6 +85,9 @@ utf8.decode('\xC2\xA9');
 utf8.decode('\xF0\x90\x80\x81');
 // → '\uD800\uDC01'
 // → U+10001 LINEAR B SYLLABLE B038 E
+
+utf8.decode('\xC2\xA9\xC2', { allowTruncatedEnd: true });
+// → '\xA9'
 ```
 
 ### `utf8.version`
