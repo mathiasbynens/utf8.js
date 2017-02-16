@@ -234,6 +234,54 @@
 			}
 		});
 
+		// Broken ending
+		equal(
+			'\x61\x62',
+			utf8.decode('\x61\x62\xD7', { allowTruncatedEnd: true }), // \xD7\x8A
+			'Decoding: 2-byte ending is broken'
+		);
+		equal(
+			'\x61\x62',
+			utf8.decode('\x61\x62\xE2', { allowTruncatedEnd: true }), // \xE2\xB0\xBC
+			'Decoding: 3-byte ending is broken'
+		);
+		equal(
+			'\x61\x62',
+			utf8.decode('\x61\x62\xE2\xB0', { allowTruncatedEnd: true }), // \xE2\xB0\xBC
+			'Decoding: 3-byte ending is broken'
+		);
+		equal(
+			'\x61\x62',
+			utf8.decode('\x61\x62\xF0', { allowTruncatedEnd: true }), // \xF0\x9D\x8C\x86
+			'Decoding: 4-byte ending is broken'
+		);
+		equal(
+			'\x61\x62',
+			utf8.decode('\x61\x62\xF0\x9D', { allowTruncatedEnd: true }), // \xF0\x9D\x8C\x86
+			'Decoding: 4-byte ending is broken'
+		);
+		equal(
+			'\x61\x62',
+			utf8.decode('\x61\x62\xF0\x9D\x8C', { allowTruncatedEnd: true }), // \xF0\x9D\x8C\x86
+			'Decoding: 4-byte ending is broken'
+		);
+		// The only symbol is broken
+		equal(
+			'',
+			utf8.decode('\xD7', { allowTruncatedEnd: true }), // \xD7\x8A
+			'Decoding: The only 2-byte is broken'
+		);
+		equal(
+			'',
+			utf8.decode('\xE2\xB0', { allowTruncatedEnd: true }), // \xE2\xB0\xBC
+			'Decoding: The only 3-byte is broken'
+		);
+		equal(
+			'',
+			utf8.decode('\xF0\x9D\x8C', { allowTruncatedEnd: true }), // \xF0\x9D\x8C\x86
+			'Decoding: The only 4-byte is broken'
+		);
+
 		// Error handling
 		raises(
 			function() {
@@ -262,6 +310,48 @@
 			},
 			Error,
 			'Error: invalid byte index'
+		);
+		raises(
+			function () {
+				utf8.decode('\xD7\x00', { allowTruncatedEnd: true });
+			},
+			Error,
+			'Error: invalid continuation byte (2-byte sequence expected)'
+		);
+		raises(
+			function () {
+				utf8.decode('\xE2\x00', { allowTruncatedEnd: true });
+			},
+			Error,
+			'Error: invalid continuation byte (3-byte sequence expected)'
+		);
+		raises(
+			function () {
+				utf8.decode('\xE2\xB0\x00', { allowTruncatedEnd: true });
+			},
+			Error,
+			'Error: invalid continuation byte (3-byte sequence expected)'
+		);
+		raises(
+			function () {
+				utf8.decode('\xF0\x00', { allowTruncatedEnd: true });
+			},
+			Error,
+			'Error: invalid continuation byte (4-byte sequence expected)'
+		);
+		raises(
+			function () {
+				utf8.decode('\xF0\x9D\x00', { allowTruncatedEnd: true });
+			},
+			Error,
+			'Error: invalid continuation byte (4-byte sequence expected)'
+		);
+		raises(
+			function () {
+				utf8.decode('\xF0\x9D\x8C\x00', { allowTruncatedEnd: true });
+			},
+			Error,
+			'Error: invalid continuation byte (4-byte sequence expected)'
 		);
 	});
 
