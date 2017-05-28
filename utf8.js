@@ -17,7 +17,10 @@
 
 	/*--------------------------------------------------------------------------*/
 
-	var stringFromCharCode = String.fromCharCode;
+	var stringFromCharCodeFn = String.fromCharCode;
+	var identifyFn = function(value) { return value; };
+	// Assigned in exported encode/decode functions
+	var stringFromCharCodeOrIdentityFn;
 
 	// Taken from https://mths.be/punycode
 	function ucs2decode(string) {
@@ -56,10 +59,10 @@
 			value = array[index];
 			if (value > 0xFFFF) {
 				value -= 0x10000;
-				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+				output += stringFromCharCodeOrIdentityFn(value >>> 10 & 0x3FF | 0xD800);
 				value = 0xDC00 | value & 0x3FF;
 			}
-			output += stringFromCharCode(value);
+			output += stringFromCharCodeOrIdentityFn(value);
 		}
 		return output;
 	}
@@ -75,42 +78,67 @@
 	/*--------------------------------------------------------------------------*/
 
 	function createByte(codePoint, shift) {
-		return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
+		return stringFromCharCodeOrIdentityFn(((codePoint >> shift) & 0x3F) | 0x80);
 	}
 
 	function encodeCodePoint(codePoint) {
 		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
-			return stringFromCharCode(codePoint);
+			return stringFromCharCodeOrIdentityFn(codePoint);
 		}
-		var symbol = '';
+		var symbol = [];
 		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
-			symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
+			symbol.push(stringFromCharCodeOrIdentityFn(((codePoint >> 6) & 0x1F) | 0xC0));
 		}
 		else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
 			checkScalarValue(codePoint);
-			symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
-			symbol += createByte(codePoint, 6);
+			symbol.push(stringFromCharCodeOrIdentityFn(((codePoint >> 12) & 0x0F) | 0xE0));
+			symbol.push(createByte(codePoint, 6));
 		}
 		else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
-			symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
-			symbol += createByte(codePoint, 12);
-			symbol += createByte(codePoint, 6);
+			symbol.push(stringFromCharCodeOrIdentityFn(((codePoint >> 18) & 0x07) | 0xF0));
+			symbol.push(createByte(codePoint, 12));
+			symbol.push(createByte(codePoint, 6));
 		}
-		symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
+		symbol.push(stringFromCharCodeOrIdentityFn((codePoint & 0x3F) | 0x80));
 		return symbol;
 	}
 
-	function utf8encode(string) {
+	function utf8Encode(string) {
 		var codePoints = ucs2decode(string);
 		var length = codePoints.length;
 		var index = -1;
 		var codePoint;
-		var byteString = '';
+		var byteArray = [];
 		while (++index < length) {
 			codePoint = codePoints[index];
-			byteString += encodeCodePoint(codePoint);
+			byteArray = byteArray.concat(encodeCodePoint(codePoint));
 		}
+		return byteArray;
+	}
+
+	function utf8EncodeToByteString(string) {
+		if(typeof(string) !== 'string') {
+			throw new Error('Invalid argument type. Expected string.');
+		}
+		stringFromCharCodeOrIdentityFn = stringFromCharCodeFn;
+		var byteArray = utf8Encode(string);
+		var byteString = byteArray.join('');
 		return byteString;
+	}
+
+	function utf8EncodeToByteArray(string) {
+		if(typeof(string) !== 'string') {
+			throw new Error('Invalid argument type. Expected string.');
+		}
+		stringFromCharCodeOrIdentityFn = identifyFn;
+		return utf8Encode(string);
+	}
+
+	function utf8EncodeToUint8Array(string) {
+		if(typeof(string) !== 'string') {
+			throw new Error('Invalid argument type. Expected string.');
+		}
+		return Uint8Array.from(utf8EncodeToByteArray(string));
 	}
 
 	/*--------------------------------------------------------------------------*/
@@ -197,8 +225,8 @@
 	var byteArray;
 	var byteCount;
 	var byteIndex;
-	function utf8decode(byteString) {
-		byteArray = ucs2decode(byteString);
+	function utf8Decode() {
+		stringFromCharCodeOrIdentityFn = stringFromCharCodeFn;
 		byteCount = byteArray.length;
 		byteIndex = 0;
 		var codePoints = [];
@@ -209,12 +237,31 @@
 		return ucs2encode(codePoints);
 	}
 
+	function utf8DecodeString(byteString) {
+		if(typeof(byteString) !== 'string') {
+			throw new Error('Invalid argument type. Expected string.');
+		}
+		byteArray = ucs2decode(byteString);
+		return utf8DecodeArray(byteArray);
+	}
+
+	function utf8DecodeArray(bArray) {
+		if(!Array.isArray(bArray) || !bArray instanceof Uint8Array) {
+			throw new Error('Invalid argument type. Expected array or Uint8Array');
+		}
+		byteArray = bArray;
+		return utf8Decode();
+	}
+
 	/*--------------------------------------------------------------------------*/
 
 	var utf8 = {
 		'version': '2.1.2',
-		'encode': utf8encode,
-		'decode': utf8decode
+		'encode': utf8EncodeToByteString,
+		'encodeToArray': utf8EncodeToByteArray,
+		'encodeToUint8Array': utf8EncodeToUint8Array,
+		'decode': utf8DecodeString,
+		'decodeArray': utf8DecodeArray
 	};
 
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
