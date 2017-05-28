@@ -230,7 +230,7 @@
 	}
 
 	function utf8DecodeArray(bArray) {
-		if(!Array.isArray(bArray) || !bArray instanceof Uint8Array) {
+		if(!Array.isArray(bArray) && !(bArray instanceof Uint8Array)) {
 			throw new Error('Invalid argument type. Expected array or Uint8Array');
 		}
 		byteArray = bArray;
