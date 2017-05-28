@@ -46,7 +46,7 @@
 	}());
 
 	var data = [
-		// // 1-byte
+		// 1-byte
 		{
 			'codePoint': 0x0000,
 			'decoded': '\0',
@@ -66,7 +66,7 @@
 			'encodedArray': [0x7F]
 		},
 
-		// // 2-byte
+		// 2-byte
 		{
 			'codePoint': 0x0080,
 			'decoded': '\x80',
@@ -86,7 +86,7 @@
 			'encodedArray': [0xDF,0xBF]
 		},
 
-		// // 3-byte
+		// 3-byte
 		{
 			'codePoint': 0x0800,
 			'decoded': '\u0800',
@@ -105,8 +105,8 @@
 			'encoded': '\xEF\xBF\xBF',
 			'encodedArray': [0xEF,0xBF,0xBF]
 		},
-		// // unmatched surrogate halves
-		// // high surrogates: 0xD800 to 0xDBFF
+		// unmatched surrogate halves
+		// high surrogates: 0xD800 to 0xDBFF
 		{
 			'codePoint': 0xD800,
 			'decoded': '\uD800',
@@ -148,7 +148,7 @@
 			'encodedArray': [0xED,0xAF,0xBF],
 			'error': true
 		},
-		// // low surrogates: 0xDC00 to 0xDFFF
+		// low surrogates: 0xDC00 to 0xDFFF
 		{
 			'codePoint': 0xDC00,
 			'decoded': '\uDC00',
@@ -191,7 +191,7 @@
 			'error': true
 		},
 
-		// // 4-byte
+		// 4-byte
 		{
 			'codePoint': 0x010000,
 			'decoded': '\uD800\uDC00',
