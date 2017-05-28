@@ -283,6 +283,11 @@
 					object.decoded,
 					'Decoding from byte array:\t' + description
 				);
+				equal(
+					utf8.decodeArray(Uint8Array.from(object.encodedArray)),
+					object.decoded,
+					'Decoding from byte array:\t' + description
+				);
 			}
 		});
 
