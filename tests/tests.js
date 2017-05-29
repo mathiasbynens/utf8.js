@@ -320,6 +320,78 @@
 			Error,
 			'Error: invalid byte index'
 		);
+
+		// Argument type checking
+		raises(
+			function() {
+				utf8.decode(123);
+			},
+			Error,
+			'Expect error when trying to call decode with a number'
+		);
+		raises(
+			function() {
+				utf8.decode([123]);
+			},
+			Error,
+			'Expect error when trying to call decode with an array'
+		);
+		raises(
+			function() {
+				utf8.decodeArray('123');
+			},
+			Error,
+			'Expect error when trying to call decodeArray with a string'
+		);
+		raises(
+			function() {
+				utf8.decodeArray(123);
+			},
+			Error,
+			'Expect error when trying to call decodeArray with a number'
+		);
+		raises(
+			function() {
+				utf8.encode(123);
+			},
+			Error,
+			'Expect error when trying to call encode with a number'
+		);
+		raises(
+			function() {
+				utf8.encode([123]);
+			},
+			Error,
+			'Expect error when trying to call encode with an array'
+		);
+		raises(
+			function() {
+				utf8.encodeToArray(123);
+			},
+			Error,
+			'Expect error when trying to call encodeToArray with a number'
+		);
+		raises(
+			function() {
+				utf8.encodeToArray([123]);
+			},
+			Error,
+			'Expect error when trying to call encodeToArray with an array'
+		);
+		raises(
+			function() {
+				utf8.encodeToUint8Array(123);
+			},
+			Error,
+			'Expect error when trying to call encodeToUint8Array with a number'
+		);
+		raises(
+			function() {
+				utf8.encodeToUint8Array([123]);
+			},
+			Error,
+			'Expect error when trying to call encodeToUint8Array with an array'
+		);
 	});
 
 	/*--------------------------------------------------------------------------*/
