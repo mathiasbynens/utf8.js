@@ -1,6 +1,5 @@
 {
 	"name": "utf8",
-	"version": "2.0.0",
 	"main": "utf8.js",
 	"ignore": [
 		"coverage",
