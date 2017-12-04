@@ -25,15 +25,18 @@
 		"utf8.js"
 	],
 	"scripts": {
-		"test": "node tests/tests.js"
+		"test": "node tests/tests.js",
+		"test-extended": "node tests/tests.js --extended",
+		"test-browser": "open tests/index.html",
+		"ci": "npm run build && npm test",
+		"build": "cd tests; if [ ! -f data.json ]; then python generate-test-data.py; fi",
+		"cover-html": "istanbul cover --report html --verbose --dir coverage tests/tests.js; istanbul report --root coverage --format html",
+		"cover-coveralls": "istanbul cover --verbose --dir coverage tests/tests.js && coveralls < coverage/lcov.info; rm -rf coverage/lcov*"
 	},
 	"devDependencies": {
 		"coveralls": "^2.11.14",
-		"grunt": "^1.0.1",
-		"grunt-shell": "^1.1.2",
 		"istanbul": "^0.4.5",
 		"qunit-extras": "^1.4.2",
-		"qunitjs": "~1.11.0",
-		"requirejs": "^2.3.2"
+		"qunitjs": "~1.11.0"
 	}
 }

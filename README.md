@@ -12,50 +12,16 @@ Via [npm](https://www.npmjs.com/):
 npm install utf8
 ```
 
-Via [Bower](http://bower.io/):
-
-```bash
-bower install utf8
-```
-
-Via [Component](https://github.com/component/component):
-
-```bash
-component install mathiasbynens/utf8.js
-```
-
 In a browser:
 
 ```html
 <script src="utf8.js"></script>
 ```
 
-In [Narwhal](http://narwhaljs.org/), [Node.js](https://nodejs.org/), and [RingoJS ≥ v0.8.0](http://ringojs.org/):
+In [Node.js](https://nodejs.org/):
 
 ```js
-var utf8 = require('utf8');
-```
-
-In [Rhino](http://www.mozilla.org/rhino/):
-
-```js
-load('utf8.js');
-```
-
-Using an AMD loader like [RequireJS](http://requirejs.org/):
-
-```js
-require(
-  {
-    'paths': {
-      'utf8': 'path/to/utf8'
-    }
-  },
-  ['utf8'],
-  function(utf8) {
-    console.log(utf8);
-  }
-);
+const utf8 = require('utf8');
 ```
 
 ## API
