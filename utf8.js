@@ -1,4 +1,4 @@
-/*! https://mths.be/utf8js v2.1.2 by @mathias */
+/*! https://mths.be/utf8js v3.0.0 by @mathias */
 ;(function(root) {
 
 	var stringFromCharCode = String.fromCharCode;
@@ -195,7 +195,7 @@
 
 	/*--------------------------------------------------------------------------*/
 
-	root.version = '2.1.2';
+	root.version = '3.0.0';
 	root.encode = utf8encode;
 	root.decode = utf8decode;
 
