@@ -101,6 +101,10 @@
 
 	function readContinuationByte() {
 		if (byteIndex >= byteCount) {
+			if (allowTruncatedEnd) {
+				return false;
+			}
+
 			throw Error('Invalid byte index');
 		}
 
@@ -142,6 +146,9 @@
 		// 2-byte sequence
 		if ((byte1 & 0xE0) == 0xC0) {
 			byte2 = readContinuationByte();
+			if (byte2 === false) {
+				return false;
+			}
 			codePoint = ((byte1 & 0x1F) << 6) | byte2;
 			if (codePoint >= 0x80) {
 				return codePoint;
@@ -154,6 +161,9 @@
 		if ((byte1 & 0xF0) == 0xE0) {
 			byte2 = readContinuationByte();
 			byte3 = readContinuationByte();
+			if (byte3 === false) {
+				return false;
+			}
 			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
 			if (codePoint >= 0x0800) {
 				checkScalarValue(codePoint);
@@ -168,6 +178,9 @@
 			byte2 = readContinuationByte();
 			byte3 = readContinuationByte();
 			byte4 = readContinuationByte();
+			if (byte4 === false) {
+				return false;
+			}
 			codePoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) |
 				(byte3 << 0x06) | byte4;
 			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
@@ -181,7 +194,9 @@
 	var byteArray;
 	var byteCount;
 	var byteIndex;
-	function utf8decode(byteString) {
+	var allowTruncatedEnd;
+	function utf8decode(byteString, options) {
+		allowTruncatedEnd = typeof options != 'undefined' ? options.allowTruncatedEnd : false;
 		byteArray = ucs2decode(byteString);
 		byteCount = byteArray.length;
 		byteIndex = 0;
