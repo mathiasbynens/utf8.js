@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import re
 import json
 
@@ -19,14 +20,14 @@ def hexify(codePoint):
 	return 'U+' + hex(codePoint)[2:].upper().zfill(6)
 
 def writeFile(filename, contents):
-	print filename
+	print(filename)
 	with open(filename, 'w') as f:
 		f.write(contents.strip() + '\n')
 
 data = []
 for codePoint in range(0x000000, 0x10FFFF + 1):
 	# Skip non-scalar values.
-	if codePoint >= 0xD800 and codePoint <= 0xDFFF:
+	if 0xD800 <= codePoint <= 0xDFFF:
 		continue
 	symbol = unisymbol(codePoint)
 	# http://stackoverflow.com/a/17199950/96656
