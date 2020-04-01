@@ -1,10 +1,7 @@
 /*! https://mths.be/utf8js v3.0.0 by @mathias */
 ;(function(root) {
 
-	var stringFromCharCodeFn = String.fromCharCode;
-	var identifyFn = function(value) { return value; };
-	// Assigned in exported encode/decode functions
-	var stringFromCharCodeOrIdentityFn;
+	var stringFromCharCode = String.fromCharCode;
 
 	// Taken from https://mths.be/punycode
 	function ucs2decode(string) {
@@ -43,10 +40,10 @@
 			value = array[index];
 			if (value > 0xFFFF) {
 				value -= 0x10000;
-				output += stringFromCharCodeOrIdentityFn(value >>> 10 & 0x3FF | 0xD800);
+				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
 				value = 0xDC00 | value & 0x3FF;
 			}
-			output += stringFromCharCodeOrIdentityFn(value);
+			output += stringFromCharCode(value);
 		}
 		return output;
 	}
@@ -62,32 +59,44 @@
 	/*--------------------------------------------------------------------------*/
 
 	function createByte(codePoint, shift) {
-		return stringFromCharCodeOrIdentityFn(((codePoint >> shift) & 0x3F) | 0x80);
+		return ((codePoint >> shift) & 0x3F) | 0x80;
+	}
+
+	function encodeCodePointToStrings(codePoint) {
+		var symbol = encodeCodePoint(codePoint);
+		if (typeof symbol === 'number') {
+			return stringFromCharCode(symbol);
+		}
+		for (var i = 0 ; i < symbol.length ; i++) {
+			symbol[i] = stringFromCharCode(symbol[i]);
+		}
+
+		return symbol;
 	}
 
 	function encodeCodePoint(codePoint) {
 		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
-			return stringFromCharCodeOrIdentityFn(codePoint);
+			return codePoint;
 		}
 		var symbol = [];
 		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
-			symbol.push(stringFromCharCodeOrIdentityFn(((codePoint >> 6) & 0x1F) | 0xC0));
+			symbol.push(((codePoint >> 6) & 0x1F) | 0xC0);
 		}
 		else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
 			checkScalarValue(codePoint);
-			symbol.push(stringFromCharCodeOrIdentityFn(((codePoint >> 12) & 0x0F) | 0xE0));
+			symbol.push(((codePoint >> 12) & 0x0F) | 0xE0);
 			symbol.push(createByte(codePoint, 6));
 		}
 		else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
-			symbol.push(stringFromCharCodeOrIdentityFn(((codePoint >> 18) & 0x07) | 0xF0));
+			symbol.push(((codePoint >> 18) & 0x07) | 0xF0);
 			symbol.push(createByte(codePoint, 12));
 			symbol.push(createByte(codePoint, 6));
 		}
-		symbol.push(stringFromCharCodeOrIdentityFn((codePoint & 0x3F) | 0x80));
+		symbol.push((codePoint & 0x3F) | 0x80);
 		return symbol;
 	}
 
-	function utf8Encode(string) {
+	function utf8Encode(string, encodeCodePointFn) {
 		var codePoints = ucs2decode(string);
 		var length = codePoints.length;
 		var index = -1;
@@ -95,7 +104,7 @@
 		var byteArray = [];
 		while (++index < length) {
 			codePoint = codePoints[index];
-			byteArray = byteArray.concat(encodeCodePoint(codePoint));
+			byteArray = byteArray.concat(encodeCodePointFn(codePoint));
 		}
 		return byteArray;
 	}
@@ -104,9 +113,8 @@
 		if(typeof(string) !== 'string') {
 			throw new Error('Invalid argument type. Expected string.');
 		}
-		stringFromCharCodeOrIdentityFn = stringFromCharCodeFn;
-		var byteArray = utf8Encode(string);
-		var byteString = byteArray.join('');
+		var encoded = utf8Encode(string, encodeCodePointToStrings);
+		var byteString = encoded.join('');
 		return byteString;
 	}
 
@@ -114,8 +122,7 @@
 		if(typeof(string) !== 'string') {
 			throw new Error('Invalid argument type. Expected string.');
 		}
-		stringFromCharCodeOrIdentityFn = identifyFn;
-		return utf8Encode(string);
+		return utf8Encode(string, encodeCodePoint);
 	}
 
 	function utf8EncodeToUint8Array(string) {
@@ -210,7 +217,6 @@
 	var byteCount;
 	var byteIndex;
 	function utf8Decode() {
-		stringFromCharCodeOrIdentityFn = stringFromCharCodeFn;
 		byteCount = byteArray.length;
 		byteIndex = 0;
 		var codePoints = [];
