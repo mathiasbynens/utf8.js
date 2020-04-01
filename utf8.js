@@ -240,10 +240,10 @@
 	/*--------------------------------------------------------------------------*/
 
 	root.version = '3.0.0';
-	root.encode = utf8encode;
+	root.encode = utf8EncodeToByteString;
 	root.encodeToArray = utf8EncodeToByteArray;
 	root.encodeToUint8Array = utf8EncodeToUint8Array;
-	root.decode = utf8decode;
+	root.decode = utf8DecodeString;
 	root.decodeArray = utf8DecodeArray;
 
 }(typeof exports === 'undefined' ? this.utf8 = {} : exports));
