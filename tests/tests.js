@@ -257,6 +257,13 @@
 				);
 				raises(
 					function() {
+						utf8.encodeToUint8Array(object.decoded);
+					},
+					Error,
+					'Expect non-scalar value detected error on encodeToUint8Array'
+				);
+				raises(
+					function() {
 						utf8.decodeArray(object.encodedArray);
 					},
 					Error,
@@ -277,6 +284,11 @@
 					utf8.encodeToArray(object.decoded),
 					object.encodedArray,
 					'Encoding to byte array:\t\t' + description
+				);
+				deepEqual(
+					utf8.encodeToUint8Array(object.decoded),
+					Uint8Array.from(object.encodedArray),
+					'Encoding to Uint8Array:\t\t' + description
 				);
 				equal(
 					utf8.decodeArray(object.encodedArray),

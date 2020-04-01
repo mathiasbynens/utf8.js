@@ -64,9 +64,6 @@
 
 	function encodeCodePointToStrings(codePoint) {
 		var symbol = encodeCodePoint(codePoint);
-		if (typeof symbol === 'number') {
-			return stringFromCharCode(symbol);
-		}
 		for (var i = 0 ; i < symbol.length ; i++) {
 			symbol[i] = stringFromCharCode(symbol[i]);
 		}
@@ -76,7 +73,7 @@
 
 	function encodeCodePoint(codePoint) {
 		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
-			return codePoint;
+			return [codePoint];
 		}
 		var symbol = [];
 		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
