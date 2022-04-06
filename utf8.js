@@ -7,7 +7,7 @@
 	function ucs2decode(string) {
 		var output = [];
 		var counter = 0;
-		var length = string.length;
+		var length = string?.length;
 		var value;
 		var extra;
 		while (counter < length) {
